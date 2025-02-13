@@ -1,13 +1,21 @@
-type Board = Player[]
-type Player = 1 | 2 | 'test' | null
-type Column = [Player, Player, Player, Player, Player, Player]
-type Status = 'ongoing' | 'won' | 'tie'
+export type Board = Player[]
+export type Player = 1 | 2 | ''
+export type Column = [Player, Player, Player, Player, Player, Player]
+export type Status = 'ongoing' | 'won' | 'tie'
 export type ColumnIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
-type GameState = {
+export type GameState = {
     board: Board,
     status: Status,
     currentPlayer: Player
+}
+
+const initialBoard: Board = Array.from({ length: 42 }, (_, i) => '')
+
+const initialGameState: GameState = {
+    board: initialBoard,
+    status: 'ongoing',
+    currentPlayer: 1
 }
 
 const rowBoundaries = [
@@ -48,7 +56,10 @@ const diagBoundariesRTL = [
 ]
 
 export function getColPlayers(colNumber: number, game: GameState): Column {
-    return [game.board[colNumber], game.board[colNumber+7], game.board[colNumber+14], game.board[colNumber+21], game.board[colNumber+28], game.board[colNumber+35]]
+    if(!game) {
+       return ['', '', '', '', '', '']
+    }
+    return [game?.board[colNumber], game?.board[colNumber+7], game?.board[colNumber+14], game?.board[colNumber+21], game?.board[colNumber+28], game?.board[colNumber+35]]
 }
 
 function getColPlayerIndexes(colNumber: number): number[] {
@@ -96,33 +107,37 @@ function checkWin(board: Board, player: Player): boolean | undefined {
     return false
 }
 
-export function move( prevGameState:GameState, colIndex: ColumnIndex ): GameState {
+function move(prevGameState:GameState, colIndex: ColumnIndex): GameState {
     const newGameState = structuredClone(prevGameState)
     
-    const selectedCol = getColPlayers(colIndex, prevGameState)
+    const selectedCol = getColPlayers(colIndex, newGameState)
+    console.log(selectedCol)
     const colPlayerIndexes = getColPlayerIndexes(colIndex)
+    console.log(colPlayerIndexes)
 
-    // console.log('selectedCol:', selectedCol)
-    // console.log('colPlayerIndexes:', colPlayerIndexes)
-    // console.log(selectedCol.includes(null))
-
-    // if there's an empty slot
-    if(selectedCol.includes(null)) {
-        // add new player
-        selectedCol.forEach((player, index) => {
-            if(player) {
-                selectedCol[index - 1] = newGameState.currentPlayer
+    // if there's an empty slot, add new player to col
+    if(selectedCol.includes('')) {
+        console.log('yes includes')
+        // add new player to col
+        for(let i=0; i<selectedCol.length; i++) {
+            if(selectedCol[i] !== '') {
+                selectedCol[i - 1] = newGameState.currentPlayer
+                break
             }
-        })
+            if(i === selectedCol.length-1) {
+                selectedCol[i] = newGameState.currentPlayer
+                break
+            }
+        }
+        console.log('selectedcol 2:', selectedCol)
         // set players at correct indexes in the board
         colPlayerIndexes.forEach((colPlayerIndex, index) => {
             newGameState.board[colPlayerIndex] = selectedCol[index]
         })
-        console.log(newGameState.board)
     }
 
     // check tie
-    if(!newGameState.board.includes(null)) {
+    if(!newGameState.board.includes('')) {
         newGameState.status = 'tie'
         return newGameState
     }
@@ -130,41 +145,47 @@ export function move( prevGameState:GameState, colIndex: ColumnIndex ): GameStat
     // check win
     if(checkWin(newGameState.board, newGameState.currentPlayer)) {
         newGameState.status = 'won'
-        console.log('someone won')
+        // console.log('someone won')
+        // console.log(newGameState)
         return newGameState
     }
 
-    // // switch players
-    // newGameState.currentPlayer = prevGameState.currentPlayer === 1 ? 2 : 1
+    // switch players
+    newGameState.currentPlayer = prevGameState.currentPlayer === 1 ? 2 : 1
 
-    // console.log('game ongoing')
-    // return newGameState
+    return newGameState
 }
 
+export { move, initialGameState}
 const winningBoardRTL:Board = [
-    null, null, null, null, null, null, null,
-    null, null, null, null, null, null, null,
-    null, null, null, 1   , null, null, null,
-    null, null, 1   , 2   , null, null, null,
-    null, 1   , 2   , 2   , null, null, null,
-    1   , 2   , 2   , 2   , null, null, null,  // Winning row (bottom)
+    ''  , ''  , ''  , ''  , ''  , ''  , ''  ,
+    ''  , ''  , ''  , ''  , ''  , ''  , ''  ,
+    ''  , ''  , ''  , 1   , ''  , ''  , ''  ,
+    ''  , ''  , 1   , 2   , ''  , ''  , ''  ,
+    ''  , ''  , 2   , 2   , ''  , ''  , ''  ,
+    1   , 2   , 2   , 2   , ''  , ''  , ''  ,  // Winning row (bottom)
 ];
-
-const test = [
-    null, null, null, null, null, null, null, 
-    null, null, null, null, null, null, null, 
-    null, null, null,   1,  null, null, null,
-    null, 'test',  1,   2,  null, null, null, 
-    null, 'test',  2,   2,  null, null, null, 
-    1,    2,       2,   2,  null, null, null
-]
+const test2 = [
+    '', '', '', '', '', '', '', 
+    '', '', '', '', '', '', '', 
+    '', '', '', 1,  '', '', '', 
+    '',  1,  1, 2,  '', '', '', 
+    '',  1,  2, 2,  '', '', '', 
+     1,  2,  2, 2, '', '', ''
+  ]
+// const test = [
+//     null, null, null, null, null, null, null, 
+//     null, null, null, null, null, null, null, 
+//     null, null, null, 1,  null, null, null,
+//     null, null,  1,   2,  null, null, null, 
+//     null, null,  2,   2,  null, null, null, 
+//     2,    2,     2,   2,  null, null, null
+// ]
 
 const winningGameState:GameState = {
     board: winningBoardRTL,
-    currentPlayer: 'test',
+    currentPlayer: 1,
     status: 'ongoing'
 }
 
-// checkWin(winningBoardRTL, 1)
-
-move(winningGameState, 1)
+console.log('move:', move(winningGameState, 1))
