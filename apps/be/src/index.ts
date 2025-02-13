@@ -1,13 +1,15 @@
 import express from "express";
 import { Server } from 'socket.io'
-import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from 'http';
+import { initialGameState, move, GameState } from "./game";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+var gameState: GameState = initialGameState
 
 const httpServer = createServer(app);
 
@@ -25,10 +27,13 @@ const io = new Server(httpServer, {
 
 io.on('connection', (socket) => {
   console.log('connected')
-  io.emit('message', "hello this is a message from the socket on the server")
-  socket.on('msg', (data) => {
-    console.log('the server received a message, wow')
-    io.emit('message', 'server ack client message')
+  io.emit('game', gameState)
+  
+  socket.on('move', (data) => {
+    console.log('server received:', data.gameState)
+    gameState = move(data.gameState, data.index)
+    console.log('new game state:', gameState)
+    io.emit('game', gameState)
   })
 })
 
