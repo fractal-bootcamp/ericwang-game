@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:5174', 'https://tw-connect-4.netlify.app/'],
+    origin: ['http://localhost:5174', 'https://tw-connect-4.netlify.app'],
     methods: ['GET', 'POST'],
     credentials: true, 
   },
