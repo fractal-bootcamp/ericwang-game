@@ -29,6 +29,11 @@ const io = new Server(httpServer, {
 
 io.on('connection', (socket) => {
   console.log('connected')
+  io.emit('message', "hello this is a message from the socket on the server")
+  socket.on('msg', (data) => {
+    console.log('the server received a message, wow')
+    io.emit('message', 'server ack client message')
+  })
 })
 
 httpServer.listen(PORT, () => {
