@@ -10,7 +10,7 @@ export type GameState = {
     currentPlayer: Player
 }
 
-const initialBoard: Board = Array.from({ length: 42 }, (_, i) => '')
+const initialBoard: Board = Array.from({ length: 42 }, () => '')
 
 const initialGameState: GameState = {
     board: initialBoard,
@@ -165,14 +165,7 @@ const winningBoardRTL:Board = [
     ''  , ''  , 2   , 2   , ''  , ''  , ''  ,
     1   , 2   , 2   , 2   , ''  , ''  , ''  ,  // Winning row (bottom)
 ];
-const test2 = [
-    '', '', '', '', '', '', '', 
-    '', '', '', '', '', '', '', 
-    '', '', '', 1,  '', '', '', 
-    '',  1,  1, 2,  '', '', '', 
-    '',  1,  2, 2,  '', '', '', 
-     1,  2,  2, 2, '', '', ''
-  ]
+
 // const test = [
 //     null, null, null, null, null, null, null, 
 //     null, null, null, null, null, null, null, 
