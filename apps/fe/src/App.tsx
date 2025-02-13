@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import './App.css'
 
 // web socket
-const socket = io('http://localhost:3001')
+const socket = io('https://connect-4-o4ye.onrender.com/')
 
 function App() {
 
